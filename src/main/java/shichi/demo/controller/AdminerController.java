@@ -1,5 +1,6 @@
 package shichi.demo.controller;
 
+import net.sf.json.JSONObject;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,10 @@ public class AdminerController {
     @Autowired
     private JwtUtils jwtUtils;
     @RequestMapping(value = "/Example", method = RequestMethod.POST)
-    //复杂的json数据用map接收
-    public Response Example1(@RequestBody Map<String,Object> map){
+    //json接收
+    public Response Example1(@RequestBody JSONObject json){
+        //获取到data对象
+        json.get("data");
         //返回结构体使用Response,默认值为操作成功
         Response res=new Response();
         return res;
