@@ -24,13 +24,8 @@ import java.util.Map;
 public class AdminerController {
     @Autowired
     private AdminerService adminerService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserDetailService userDetailService;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @RequestMapping(value = "/Example", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/Example1", method = RequestMethod.POST)
     //json接收
     public Response Example1(@RequestBody JSONObject json){
         //获取到data对象
@@ -44,7 +39,7 @@ public class AdminerController {
     public Response Example2(@Valid Object object,BindingResult bindingResult){
         //返回结构体使用Response,默认值为操作成功
         Response res=new Response();
-        //错误信息的获取
+        //校验参数的错误信息的获取
         if(bindingResult.hasErrors()){
             res.setCode(1);
             res.setMessage(bindingResult.getFieldError().getDefaultMessage());
