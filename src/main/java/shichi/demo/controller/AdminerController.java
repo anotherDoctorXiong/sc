@@ -1,18 +1,11 @@
 package shichi.demo.controller;
 
 import net.sf.json.JSONObject;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import shichi.demo.components.Security.UserDetailService;
-import shichi.demo.Service.AdminerService;
-import shichi.demo.components.Security.JwtUtils;
+import shichi.demo.service.AdminerService;
 import shichi.demo.model.Response;
 import shichi.demo.model.autoModel.Admin;
 

@@ -1,4 +1,4 @@
-package shichi.demo.Service;
+package shichi.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
