@@ -1,7 +1,6 @@
 package shichi.demo.model;
 
 import com.github.pagehelper.PageInfo;
-import org.springframework.validation.BindingResult;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,17 +19,6 @@ public class Response {
         }
     };
 
-    //操作成功
-    public static final int SUCCESS = 200;
-    //操作失败
-    public static final int FAILED = 500;
-    //参数校验失败
-    public static final int VALIDATE_FAILED = 404;
-    //未认证
-    public static final int UNAUTHORIZED = 401;
-    //未授权
-    public static final int  FORBIDDEN = 403;
-
 
     public Response() {
         this.code = 0;
@@ -44,64 +32,13 @@ public class Response {
      * @param data 获取的数据
      */
     public Response success(Object data) {
-        this.code = SUCCESS;
+        this.code = 0;
         this.message = "操作成功";
         this.data = data;
         return this;
     }
 
-    /**
-     * 普通失败提示信息
-     */
-    public Response failed() {
-        this.code = FAILED;
-        this.message = "操作失败";
-        return this;
-    }
 
-    /**
-     * 参数验证失败使用
-     *
-     * @param message 错误信息
-     */
-    public Response validateFailed(String message) {
-        this.code = VALIDATE_FAILED;
-        this.message = message;
-        return this;
-    }
-
-    /**
-     * 未登录时使用
-     *
-     * @param message 错误信息
-     */
-    public Response unauthorized(String message) {
-        this.code = UNAUTHORIZED;
-        this.message = "暂未登录或token已经过期";
-        this.data = message;
-        return this;
-    }
-
-    /**
-     * 未授权时使用
-     *
-     * @param message 错误信息
-     */
-    public Response forbidden(String message) {
-        this.code = FORBIDDEN;
-        this.message = "没有相关权限";
-        this.data = message;
-        return this;
-    }
-
-    /**
-     * 参数验证失败使用
-     * @param result 错误信息
-     */
-    public Response validateFailed(BindingResult result) {
-        validateFailed(result.getFieldError().getDefaultMessage());
-        return this;
-    }
 
     /**
      * 返回分页成功数据
@@ -114,7 +51,7 @@ public class Response {
         result.put("total", pageInfo.getTotal());
         result.put("pageNum", pageInfo.getPageNum());
         result.put("lists", pageInfo.getList());
-        this.code = SUCCESS;
+        this.code = 0;
         this.message = "操作成功";
         this.data = result;
         return this;
