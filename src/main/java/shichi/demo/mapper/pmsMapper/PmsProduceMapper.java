@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import shichi.demo.model.pmsModel.PmsProduce;
 import shichi.demo.model.pmsModel.PmsProduceExample;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public interface PmsProduceMapper {
@@ -33,5 +33,5 @@ public interface PmsProduceMapper {
 
     int updatePmsProduceSelective(PmsProduce pmsProduce);
 
-    List<PmsProduce> getPmsProduceByCondition(@Param("record") Map<String, Object> map);
+    List<PmsProduce> getPmsProduceByCondition( HashMap<String, Object> map);
 }

@@ -15,4 +15,6 @@ public interface PmsBrandService {
     List<PmsBrand> getPmsBrandAllList();
 
     List getPmsBrandList(Integer pageNum, Integer pageSize);
+
+    List getPmsBrandByBrandName(String brandName);
 }

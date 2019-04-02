@@ -1,13 +1,13 @@
 package shichi.demo.controller.pmsController;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shichi.demo.model.Response;
 import shichi.demo.model.pmsModel.PmsBrand;
 import shichi.demo.service.pmsService.PmsBrandService;
 
-import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 品牌功能 Controller
@@ -20,52 +20,56 @@ public class PmsBrandController {
 
     /**
      * 新建品牌
-     * @param pmsBrand 品牌实体
-     * @param bindingResult
+     * @param data String
      * @return Response
      */
     @CrossOrigin("*")
-    @PostMapping("/createPmsBrand")
-    public Response createPmsBrand(@Valid @RequestBody PmsBrand pmsBrand, BindingResult bindingResult) {
-        System.out.println(pmsBrand);
+    @PostMapping("/new")
+    public Response createPmsBrand(@RequestBody String data) {
         Response res = new Response();
-        if (bindingResult.hasErrors()) {
-            res.failed();
-            res.setMessage(bindingResult.getFieldError().getDefaultMessage());
-            return res;
-        }else {
-            int count = pmsBrandService.createPmsBrand(pmsBrand);
-            if (count == 1) {
-                res.success(count);
+        if (!data.isEmpty()) {
+            PmsBrand pmsBrand = JSON.parseObject(data, PmsBrand.class);
+            String brandName = pmsBrand.getBrandName();
+            List temp = pmsBrandService.getPmsBrandByBrandName(brandName);
+            //新建品牌前先判断该品牌是否已存在，保证品牌的唯一性
+            if (temp.size() == 0) {
+                int count = pmsBrandService.createPmsBrand(pmsBrand);
+                if (count == 1) {
+                    res.setMessage("新建品牌成功!");
+                } else {
+                    res.setMessage("新建品牌失败!");
+                }
+                return res;
             }else {
-                res.failed();
+                res.setMessage("新建品牌失败,该品牌已存在!");
             }
-            return res;
+        }else {
+            res.setMessage("参数错误!");
         }
+        return res;
     }
 
     /**
-     * 更新品牌
-     * @param pmsBrand
-     * @param bindingResult
+     * 修改品牌
+     * @param data String
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/updatePmsBrand", method = RequestMethod.POST)
-    public Response updatePmsBrand(@Valid @RequestBody PmsBrand pmsBrand, BindingResult bindingResult) {
+    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    public Response updatePmsBrand(@RequestBody String data) {
         Response res = new Response();
-        if (bindingResult.hasErrors()) {
-            res.failed();
-            res.setMessage(bindingResult.getFieldError().getDefaultMessage());
-            return res;
-        }else {
+        if (!data.isEmpty()) {
+            PmsBrand pmsBrand = JSON.parseObject(data, PmsBrand.class);
             int count = pmsBrandService.updatePmsBrand(pmsBrand);
             if (count == 1) {
-                res.success(count);
+                res.setMessage("修改品牌成功!");
             }else {
-                res.failed();
+                res.setMessage("修改品牌失败!");
             }
-        }   return res;
+            return res;
+        }
+        res.setMessage("参数错误!");
+        return res;
     }
 
     /**
@@ -73,7 +77,7 @@ public class PmsBrandController {
      * @return Response
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/getPmsBrandAllList", method = RequestMethod.GET)
+    @RequestMapping(value = "/list/all", method = RequestMethod.POST)
     public Response getPmsBrandAllList() {
         Response res = new Response();
         return res.success(pmsBrandService.getPmsBrandAllList());
@@ -86,7 +90,7 @@ public class PmsBrandController {
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/getPmsBrandList", method = RequestMethod.GET)
+    @RequestMapping(value = "/list/page", method = RequestMethod.POST)
     public Response getPmsBrandList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Response res = new Response();

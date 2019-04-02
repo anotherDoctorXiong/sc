@@ -2,8 +2,8 @@ package shichi.demo.service.pmsService;
 
 import shichi.demo.model.pmsModel.PmsProduce;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public interface PmsProduceService {
     int createPmsProduce(PmsProduce pmsProduce);
@@ -12,5 +12,7 @@ public interface PmsProduceService {
 
     List getPmsProduceList(Integer pageNum, Integer pageSize);
 
-    List<PmsProduce> getPmsProduceByCondition(Map<String, Object> map);
+    List<PmsProduce> getPmsProduceByCondition(HashMap<String, Object> map);
+
+    List<PmsProduce> getPmsProduceAllList();
 }

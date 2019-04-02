@@ -1,15 +1,14 @@
 package shichi.demo.controller.pmsController;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shichi.demo.model.Response;
 import shichi.demo.model.pmsModel.PmsProduce;
 import shichi.demo.service.pmsService.PmsProduceService;
 
-import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 产品功能 Controller
@@ -20,75 +19,64 @@ public class PmsProduceController {
     @Autowired
     private PmsProduceService pmsProduceService;
 
-//    @CrossOrigin("*")
-//    @RequestMapping("/insert")
-//    public Response insert(@Valid @RequestBody String promes){
-//        Response res = new Response();
-//
-//        PmsProduce pmsProduce = JSON.parseObject(promes, PmsProduce.class);
-//
-//        int pmsProduce1 = pmsProduceService.createPmsProduce(pmsProduce);
-//
-//        if(pmsProduce1!=0){
-//            res.success(1);
-//        }else {
-//            res.failed();
-//        }
-//
-//        return  res;
-//    }
-
     /**
+     *
      * 新建产品
-     * @param pmsProduce 产品实体
-     * @param bindingResult
+     * @param data String
      * @return Response
      */
     @CrossOrigin("*")
-    @PostMapping("/createPmsProduce")
-    public Response createPmsProduce(@Valid @RequestBody PmsProduce pmsProduce, BindingResult bindingResult) {
+    @PostMapping("/new")
+    public Response createPmsProduce(@RequestBody String data) {
         Response res = new Response();
-        if (bindingResult.hasErrors()) {
-            res.failed();
-            //res.setMessage(bindingResult.getFieldError().getDefaultMessage());
-            res.setMessage("产品参数填写有误");
-            return res;
-        }else {
+        if (!data.isEmpty()) {
+            PmsProduce pmsProduce = JSON.parseObject(data, PmsProduce.class);
             int count = pmsProduceService.createPmsProduce(pmsProduce);
             if (count == 1) {
-                res.success(count);
-            }else {
-                res.failed();
+                res.setMessage("新建产品成功!");
+            } else {
+                res.setMessage("新建产品失败!");
             }
             return res;
+        }else {
+            res.setMessage("参数错误!");
         }
+        return res;
     }
 
     /**
      * 更新产品信息
-     * @param pmsProduce
-     * @param bindingResult
-     * @return
+     * @param data String
+     * @return Response
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/updatePmsProduce", method = RequestMethod.POST)
-    public Response updatePmsProduce(@Valid @RequestBody PmsProduce pmsProduce, BindingResult bindingResult) {
+    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    public Response updatePmsProduce(@RequestBody String data) {
         Response res = new Response();
-        if (bindingResult.hasErrors()) {
-            res.failed();
-            //res.setMessage(bindingResult.getFieldError().getDefaultMessage());
-            res.setMessage("产品参数填写有误");
-            return res;
-        }else {
+        if (!data.isEmpty()) {
+            PmsProduce pmsProduce = JSON.parseObject(data, PmsProduce.class);
             int count = pmsProduceService.updatePmsProduce(pmsProduce);
             if (count == 1) {
-                res.success(count);
+                res.setMessage("修改产品成功!");
             }else {
-                res.failed();
+                res.setMessage("修改产品失败!");
             }
-        }   return res;
+            return res;
+        }
+        res.setMessage("参数错误!");
+        return res;
     }
 
+    /**
+     * 获取所有产品列表
+     * @return Response
+     */
+    @CrossOrigin("*")
+    @RequestMapping(value = "/list/all", method = RequestMethod.POST)
+    public Response getPmsProduceAllList() {
+        Response res = new Response();
+        return res.success(pmsProduceService.getPmsProduceAllList());
+    }
     /**
      * 分页查询产品列表
      * @param pageNum
@@ -96,7 +84,7 @@ public class PmsProduceController {
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/getPmsProduceList", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     public Response getPmsProduceList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Response res = new Response();
@@ -109,12 +97,12 @@ public class PmsProduceController {
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/getPmsProduceByCondition", method = RequestMethod.GET)
-    public Response getPmsProduceByCondition(Map<String, Object> map) {
+    @RequestMapping(value = "/list/page", method = RequestMethod.POST)
+    public Response getPmsProduceByCondition(@RequestBody HashMap<String, Object> map) {
         Response res = new Response();
         System.out.println(map);
         List<PmsProduce> pmsProduceList = pmsProduceService.getPmsProduceByCondition(map);
-        return res.success(pmsProduceList);
+        return res.pageSuccess(pmsProduceList);
     }
 
 

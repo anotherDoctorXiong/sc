@@ -27,4 +27,17 @@ public class StringUtil {
         //将承载的字符转换成字符串
         return sb.toString();
     }
+
+    /**
+     * 校验字符是否为空
+     * @param value
+     * @return
+     */
+    public static boolean isNullOrEmpty(String value) {
+        if (value == null || value.length() == 0) {
+            return true;
+        }else {
+            return false;
+        }
+    }
 }

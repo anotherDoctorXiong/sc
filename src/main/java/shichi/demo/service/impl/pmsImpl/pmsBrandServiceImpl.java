@@ -9,6 +9,7 @@ import shichi.demo.model.pmsModel.PmsBrandExample;
 import shichi.demo.service.pmsService.PmsBrandService;
 import shichi.demo.util.StringUtil;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +23,10 @@ public class pmsBrandServiceImpl implements PmsBrandService {
     @Override
     public int createPmsBrand(PmsBrand pmsBrand) {
         pmsBrand.setBrandId(StringUtil.getRandomString(6));
-        return pmsBrandMapper.insertSelective(pmsBrand);
+        Date createdTime = new Date();
+        //System.out.println(createdTime.toString());
+        pmsBrand.setCreatedTime(createdTime);
+        return pmsBrandMapper.insert(pmsBrand);
     }
 
     @Override
@@ -41,5 +45,10 @@ public class pmsBrandServiceImpl implements PmsBrandService {
         PmsBrandExample pmsBrandExample = new PmsBrandExample();
         //pmsBrandExample.setOrderByClause("sort desc");
         return pmsBrandMapper.selectByExample(pmsBrandExample);
+    }
+
+    @Override
+    public List getPmsBrandByBrandName(String brandName) {
+        return pmsBrandMapper.selectByBrandName(brandName);
     }
 }
