@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shichi.demo.mapper.umsMapper.UmsUserMapper">
+
+  <resultMap id="BaseResultMap" type="HashMap">
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="nickname" jdbcType="VARCHAR" property="nickName" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="integration" jdbcType="INTEGER" property="integration" />
+    <result column="subscription_state" jdbcType="BIT" property="subscriptionState" />
+    <result column="open_id" jdbcType="VARCHAR" property="openId" />
+    <result column="register_time" jdbcType="TIMESTAMP" property="registerTime" />
+    <result column="state" jdbcType="BIT" property="state" />
+    <result column="last_visit_time" jdbcType="TIMESTAMP" property="lastVisitTime" />
+
+    <collection property="tags" column="user_id" select="selectTagById" javaType="java.util.List"/>
+  </resultMap>
+
+  <select id="selectTagById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select tag_id as tagId,tag_name as tagName
+    from ums_tag
+    where ums_tag.tag_id in (
+    select tag_id
+    from ums_user_tag_relation
+    where ums_user_tag_relation.user_id = #{user_id,jdbcType=VARCHAR})
+  </select>
+
+  <select id="selectUserAll" resultMap="BaseResultMap">
+    select user_id, nickname, phone, integration, subscription_state, open_id, register_time, state, last_visit_time
+    from ums_user
+  </select>
+
+  <!--按条件查询用户信息列表-->
+  <select id="selectUserByCondition" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    select user_id, nickname, phone, integration, subscription_state, open_id, register_time, state, last_visit_time
+    from ums_user
+    <where>
+      <if test="userId != null and userId != '' ">
+        and user_id = #{userId}
+      </if>
+      <if test="nickname != null and nickname != '' ">
+        and nickname = #{nickname}
+      </if>
+      <if test="phone != null and phone != '' ">
+        and phone = #{phone}
+      </if>
+      <if test="subscriptionState != null and subscriptionState != '' ">
+        and subscription_state = #{subscriptionState}
+      </if>
+      <if test="tagId != null and tagId != '' ">
+        and user_id in
+        (select user_id from ums_user_tag_relation where tag_id = #{tagId})
+      </if>
+      <if test="state != null and state != '' ">
+        and state = #{state}
+      </if>
+      <if test="registerStartTime != null and !registerStartTime.isEmpty()">
+        and register_time  between #{registerStartTime[0]} and #{registerStartTime[1]}
+      </if>
+    </where>
+  </select>
+
+  <update id="updateUserStateByUserId" parameterType="java.util.HashMap">
+    update ums_user
+    set state = #{state}
+    where user_id in 
+    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+  <update id="updateIntegrationByUserId" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistory">
+    update ums_user
+    set integration = #{integration,jdbcType=INTEGER}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+
+  <delete id="deleteRelationByUserId" parameterType="java.lang.String">
+    delete from ums_user_tag_relation
+    where user_id = #{userId}
+  </delete>
+
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    user_id, nickname, phone, address, integration, subscription_state, open_id, register_time, 
+    state, history_integration, last_visit_time
+  </sql>
+  <select id="selectByExample" parameterType="shichi.demo.model.umsModel.UmsUserExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ums_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="shichi.demo.model.umsModel.UmsUserExample">
+    delete from ums_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="shichi.demo.model.umsModel.UmsUser">
+    insert into ums_user (user_id, nickname, phone, 
+      address, integration, subscription_state, 
+      open_id, register_time, state, 
+      history_integration, last_visit_time)
+    values (#{userId,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{integration,jdbcType=INTEGER}, #{subscriptionState,jdbcType=BIT}, 
+      #{openId,jdbcType=VARCHAR}, #{registerTime,jdbcType=TIMESTAMP}, #{state,jdbcType=BIT}, 
+      #{historyIntegration,jdbcType=INTEGER}, #{lastVisitTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="shichi.demo.model.umsModel.UmsUser">
+    insert into ums_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="nickname != null">
+        nickname,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="integration != null">
+        integration,
+      </if>
+      <if test="subscriptionState != null">
+        subscription_state,
+      </if>
+      <if test="openId != null">
+        open_id,
+      </if>
+      <if test="registerTime != null">
+        register_time,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="historyIntegration != null">
+        history_integration,
+      </if>
+      <if test="lastVisitTime != null">
+        last_visit_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="nickname != null">
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="integration != null">
+        #{integration,jdbcType=INTEGER},
+      </if>
+      <if test="subscriptionState != null">
+        #{subscriptionState,jdbcType=BIT},
+      </if>
+      <if test="openId != null">
+        #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="registerTime != null">
+        #{registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=BIT},
+      </if>
+      <if test="historyIntegration != null">
+        #{historyIntegration,jdbcType=INTEGER},
+      </if>
+      <if test="lastVisitTime != null">
+        #{lastVisitTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="shichi.demo.model.umsModel.UmsUserExample" resultType="java.lang.Long">
+    select count(*) from ums_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ums_user
+    <set>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nickname != null">
+        nickname = #{record.nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null">
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null">
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.integration != null">
+        integration = #{record.integration,jdbcType=INTEGER},
+      </if>
+      <if test="record.subscriptionState != null">
+        subscription_state = #{record.subscriptionState,jdbcType=BIT},
+      </if>
+      <if test="record.openId != null">
+        open_id = #{record.openId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registerTime != null">
+        register_time = #{record.registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.state != null">
+        state = #{record.state,jdbcType=BIT},
+      </if>
+      <if test="record.historyIntegration != null">
+        history_integration = #{record.historyIntegration,jdbcType=INTEGER},
+      </if>
+      <if test="record.lastVisitTime != null">
+        last_visit_time = #{record.lastVisitTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ums_user
+    set user_id = #{record.userId,jdbcType=VARCHAR},
+      nickname = #{record.nickname,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      integration = #{record.integration,jdbcType=INTEGER},
+      subscription_state = #{record.subscriptionState,jdbcType=BIT},
+      open_id = #{record.openId,jdbcType=VARCHAR},
+      register_time = #{record.registerTime,jdbcType=TIMESTAMP},
+      state = #{record.state,jdbcType=BIT},
+      history_integration = #{record.historyIntegration,jdbcType=INTEGER},
+      last_visit_time = #{record.lastVisitTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+
+</mapper>

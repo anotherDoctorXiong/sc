@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shichi.demo.mapper.umsMapper.UmsIntegrationChangeHistoryMapper">
+  <resultMap id="BaseResultMap" type="HashMap">
+    <result column="change_id" jdbcType="VARCHAR" property="changeId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="activity_id" jdbcType="VARCHAR" property="activityId" />
+    <result column="before_changed_count" jdbcType="INTEGER" property="before" />
+    <result column="changed_count" jdbcType="INTEGER" property="changedCount" />
+    <result column="admin_id" jdbcType="VARCHAR" property="adminId" />
+    <result column="operate_note" jdbcType="VARCHAR" property="operationNote" />
+    <result column="data_state" jdbcType="BIT" property="dataState" />
+    <result column="changed_reason" jdbcType="VARCHAR" property="changedReason" />
+    <result column="manual_changed_reason" jdbcType="VARCHAR" property="manualChangedReason" />
+
+    <!--用户昵称-->
+    <association property="nickName" column="user_id" select="selectNicknameById" javaType="String"/>
+
+    <!--操作人昵称-->
+    <association property="operationPerson" column="admin_id" select="selectOperateManById" javaType="String" />
+
+    <!--所属活动名称-->
+    <association property="activityName" column="activity_id" select="selectActivityNameById" javaType="String"/>
+
+  </resultMap>
+
+  <select id="selectNicknameById" parameterType="java.lang.String" resultType="java.lang.String">
+    select nickname from ums_user
+    where ums_user.user_id = #{user_id}
+  </select>
+
+  <select id="selectOperateManById" parameterType="java.lang.String" resultType="java.lang.String">
+    select nick_name from ums_admin
+    where ums_admin.admin_id = #{admin_id}
+  </select>
+
+  <select id="selectActivityNameById" parameterType="java.lang.String" resultType="java.lang.String">
+    select activity_name
+    from cms_activity
+    where cms_activity.activity_id = #{activity_id}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select  *
+    from ums_integration_change_history
+  </select>
+
+  <select id="selectByCondition" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+    select *
+    from ums_integration_change_history
+    <where>
+      <if test="changedStartTime != null and !changedStartTime.isEmpty() ">
+        and created_time between #{changedStartTime[0]} and #{changedStartTime[1]}
+      </if>
+      <if test="changedReason != null and changedReason != ''">
+        and changed_reason = #{changedReason}
+      </if>
+      <if test="manualChangedReason != null and manualChangedReason != ''">
+        and manual_changed_reason = #{manualChangedReason}
+      </if>
+      <if test="dataState != null and dataState != ''">
+        and data_state = #{dataState}
+      </if>
+      <if test="userId != null and userId != ''">
+        and user_id = #{userId}
+      </if>
+      <if test="nickname != null and nickname != ''">
+        and user_id =
+        (select user_id from ums_user where nickname = #{nickname})
+      </if>
+    </where>
+
+  </select>
+
+  <update id="updateChangeHistoryDataState" parameterType="java.util.HashMap">
+    update ums_integration_change_history
+    set data_state = #{dataState}
+    where change_id in
+    <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
+
+
+
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    change_id, user_id, created_time, activity_id, before_changed_count, changed_count, 
+    admin_id, operate_note, data_state, changed_reason, manual_changed_reason
+  </sql>
+  <select id="selectByExample" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistoryExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ums_integration_change_history
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistoryExample">
+    delete from ums_integration_change_history
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistory">
+    insert into ums_integration_change_history (change_id, user_id, created_time, 
+      activity_id, before_changed_count, changed_count, 
+      admin_id, operate_note, data_state, 
+      changed_reason, manual_changed_reason)
+    values (#{changeId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{activityId,jdbcType=VARCHAR}, #{beforeChangedCount,jdbcType=INTEGER}, #{changedCount,jdbcType=INTEGER},
+      #{adminId,jdbcType=VARCHAR}, #{operateNote,jdbcType=VARCHAR}, #{dataState,jdbcType=BIT},
+      #{changedReason,jdbcType=VARCHAR}, #{manualChangedReason,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistory">
+    insert into ums_integration_change_history
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="changeId != null">
+        change_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="activityId != null">
+        activity_id,
+      </if>
+      <if test="beforeChangedCount != null">
+        before_changed_count,
+      </if>
+      <if test="changedCount != null">
+        changed_count,
+      </if>
+      <if test="adminId != null">
+        admin_id,
+      </if>
+      <if test="operateNote != null">
+        operate_note,
+      </if>
+      <if test="dataState != null">
+        data_state,
+      </if>
+      <if test="changedReason != null">
+        changed_reason,
+      </if>
+      <if test="manualChangedReason != null">
+        manual_changed_reason,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="changeId != null">
+        #{changeId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeChangedCount != null">
+        #{beforeChangedCount,jdbcType=INTEGER},
+      </if>
+      <if test="changedCount != null">
+        #{changedCount,jdbcType=INTEGER},
+      </if>
+      <if test="adminId != null">
+        #{adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="operateNote != null">
+        #{operateNote,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        #{dataState,jdbcType=BIT},
+      </if>
+      <if test="changedReason != null">
+        #{changedReason,jdbcType=VARCHAR},
+      </if>
+      <if test="manualChangedReason != null">
+        #{manualChangedReason,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistoryExample" resultType="java.lang.Long">
+    select count(*) from ums_integration_change_history
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ums_integration_change_history
+    <set>
+      <if test="record.changeId != null">
+        change_id = #{record.changeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createdTime != null">
+        created_time = #{record.createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.activityId != null">
+        activity_id = #{record.activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.beforeChangedCount != null">
+        before_changed_count = #{record.beforeChangedCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.changedCount != null">
+        changed_count = #{record.changedCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.adminId != null">
+        admin_id = #{record.adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operateNote != null">
+        operate_note = #{record.operateNote,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataState != null">
+        data_state = #{record.dataState,jdbcType=BIT},
+      </if>
+      <if test="record.changedReason != null">
+        changed_reason = #{record.changedReason,jdbcType=VARCHAR},
+      </if>
+      <if test="record.manualChangedReason != null">
+        manual_changed_reason = #{record.manualChangedReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ums_integration_change_history
+    set change_id = #{record.changeId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      created_time = #{record.createdTime,jdbcType=TIMESTAMP},
+      activity_id = #{record.activityId,jdbcType=VARCHAR},
+      before_changed_count = #{record.beforeChangedCount,jdbcType=INTEGER},
+      changed_count = #{record.changedCount,jdbcType=INTEGER},
+      admin_id = #{record.adminId,jdbcType=VARCHAR},
+      operate_note = #{record.operateNote,jdbcType=VARCHAR},
+      data_state = #{record.dataState,jdbcType=BIT},
+      changed_reason = #{record.changedReason,jdbcType=VARCHAR},
+      manual_changed_reason = #{record.manualChangedReason,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>
