@@ -72,7 +72,7 @@ public class PmsProduceController {
      * @return Response
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/list/all", method = RequestMethod.POST)
+    @RequestMapping(value = "/list/all", method = RequestMethod.GET)
     public Response getPmsProduceAllList() {
         Response res = new Response();
         return res.success(pmsProduceService.getPmsProduceAllList());
@@ -84,7 +84,7 @@ public class PmsProduceController {
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/list/page", method = RequestMethod.POST)
     public Response getPmsProduceList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Response res = new Response();
@@ -97,12 +97,19 @@ public class PmsProduceController {
      * @return
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/list/page", method = RequestMethod.POST)
+    @RequestMapping(value = "/list/condition/page", method = RequestMethod.POST)
     public Response getPmsProduceByCondition(@RequestBody HashMap<String, Object> map) {
         Response res = new Response();
         System.out.println(map);
         List<PmsProduce> pmsProduceList = pmsProduceService.getPmsProduceByCondition(map);
-        return res.pageSuccess(pmsProduceList);
+        if (pmsProduceList.size() > 0) {
+            res.pageSuccess(pmsProduceList);
+            res.setMessage("查询成功!");
+        }else {
+            res.pageSuccess(pmsProduceList);
+            res.setMessage("查询结果为空!");
+        }
+        return res;
     }
 
 

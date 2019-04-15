@@ -35,6 +35,11 @@ public class PmsProduceServiceImpl implements PmsProduceService {
         return pmsProduceMapper.insertPmsProduce(pmsProduce);
     }
 
+    /**
+     * 更新产品信息
+     * @param pmsProduce
+     * @return
+     */
     @Override
     public int updatePmsProduce(PmsProduce pmsProduce) {
         String brandName = pmsBrandMapper.getBrandNameByBrandId(pmsProduce.getBrandId());
@@ -60,7 +65,6 @@ public class PmsProduceServiceImpl implements PmsProduceService {
         Integer pageSize = (Integer) map.get("pageSize");
         PageHelper.startPage(pageNum, pageSize);
         return pmsProduceMapper.getPmsProduceByCondition(map);
-        // return null;
     }
 
 

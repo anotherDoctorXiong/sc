@@ -2,7 +2,6 @@ package shichi.demo.components.Security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -14,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import shichi.demo.config.CorsFilter;
 
 @Component
 @EnableWebSecurity
@@ -25,6 +25,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthFail authFail;
     private AuthDenied authDenied;
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CorsFilter corsFilter;
 
     @Bean
     @Override
@@ -54,7 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .headers().cacheControl();
-        httpSecurity.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(corsFilter,UsernamePasswordAuthenticationFilter.class);
         httpSecurity.exceptionHandling()
                 .authenticationEntryPoint(authFail)
                 .accessDeniedHandler(authDenied);

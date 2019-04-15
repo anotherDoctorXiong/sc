@@ -15,7 +15,7 @@ public class Response {
     public final static Map<Integer, String> ErrorMessage = new HashMap<Integer, String>() {
         {
             put(0, "success");
-            put(1, "error params");
+            put(1, "error");
         }
     };
 
@@ -33,7 +33,7 @@ public class Response {
      */
     public Response success(Object data) {
         this.code = 0;
-        this.message = "操作成功";
+        this.message = "查询成功!";
         this.data = data;
         return this;
     }
@@ -51,8 +51,6 @@ public class Response {
         result.put("total", pageInfo.getTotal());
         result.put("pageNum", pageInfo.getPageNum());
         result.put("lists", pageInfo.getList());
-        this.code = 0;
-        this.message = "操作成功";
         this.data = result;
         return this;
     }
@@ -62,7 +60,6 @@ public class Response {
 
     public void setCode(int code) {
         this.code = code;
-        this.message = ErrorMessage.get(this.code);
     }
 
     public String getMessage() {

@@ -10,7 +10,7 @@ import shichi.demo.service.pmsService.PmsBrandService;
 import java.util.List;
 
 /**
- * 品牌功能 Controller
+ * 品牌管理功能 Controller
  */
 @RestController
 @RequestMapping(value = "/brand")
@@ -35,12 +35,15 @@ public class PmsBrandController {
             if (temp.size() == 0) {
                 int count = pmsBrandService.createPmsBrand(pmsBrand);
                 if (count == 1) {
+                    res.setCode(0);
                     res.setMessage("新建品牌成功!");
                 } else {
+                    res.setCode(1);
                     res.setMessage("新建品牌失败!");
                 }
                 return res;
             }else {
+                res.setCode(1);
                 res.setMessage("新建品牌失败,该品牌已存在!");
             }
         }else {
@@ -62,13 +65,16 @@ public class PmsBrandController {
             PmsBrand pmsBrand = JSON.parseObject(data, PmsBrand.class);
             int count = pmsBrandService.updatePmsBrand(pmsBrand);
             if (count == 1) {
+                res.setCode(0);
                 res.setMessage("修改品牌成功!");
             }else {
-                res.setMessage("修改品牌失败!");
+                res.setCode(1);
+                res.setMessage("该品牌已存在,修改失败!");
             }
-            return res;
+        }else {
+            res.setCode(1);
+            res.setMessage("参数错误!");
         }
-        res.setMessage("参数错误!");
         return res;
     }
 
@@ -77,7 +83,7 @@ public class PmsBrandController {
      * @return Response
      */
     @CrossOrigin("*")
-    @RequestMapping(value = "/list/all", method = RequestMethod.POST)
+    @RequestMapping(value = "/list/all", method = RequestMethod.GET)
     public Response getPmsBrandAllList() {
         Response res = new Response();
         return res.success(pmsBrandService.getPmsBrandAllList());
@@ -94,6 +100,14 @@ public class PmsBrandController {
     public Response getPmsBrandList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Response res = new Response();
-        return res.pageSuccess(pmsBrandService.getPmsBrandList(pageNum, pageSize));
+        List brandList = pmsBrandService.getPmsBrandList(pageNum, pageSize);
+        if (brandList.size() >0 ) {
+            res.pageSuccess(brandList);
+            res.setMessage("查询品牌成功!");
+        }else {
+            res.pageSuccess(brandList);
+            res.setMessage("查询结果为空!");
+        }
+        return res;
     }
 }

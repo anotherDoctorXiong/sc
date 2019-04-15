@@ -34,4 +34,19 @@ public interface PmsBrandMapper {
             @Result(property = "brandName", column = "brand_Name")
     })
     String getBrandNameByBrandId(@Param("brandId") String brandId);
+
+    /**
+     * 根据品牌id 更新产品表里的品牌名称
+     * @param brandId
+     * @param brandName
+     * @return
+     */
+    int updatePmsProduceByBrandId(String brandId, String brandName);
+
+    /**
+     * 根据品牌名称查询是否已有品牌信息
+     * @param brandName
+     * @return
+     */
+    PmsBrand getBrandByBrandName(String brandName);
 }
