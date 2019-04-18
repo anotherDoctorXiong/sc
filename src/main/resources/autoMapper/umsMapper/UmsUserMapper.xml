@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="shichi.demo.mapper.umsMapper.UmsUserMapper">
 
+  <!--用户信息结果集-->
   <resultMap id="BaseResultMap" type="HashMap">
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
     <result column="nickname" jdbcType="VARCHAR" property="nickName" />
@@ -18,6 +19,62 @@
     <collection property="tags" column="user_id" select="selectTagById" javaType="java.util.List"/>
   </resultMap>
 
+  <!--首页运营概况-->
+  <resultMap id="CountDataMap" type="HashMap">
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="new_user_num" jdbcType="INTEGER" property="newUserNum" />
+    <result column="active_user_num" jdbcType="INTEGER" property="activeUserNum" />
+    <result column="report_num" jdbcType="INTEGER" property="reportNum" />
+    <result column="activity_part_num" jdbcType="INTEGER" property="activityPartNum" />
+  </resultMap>
+
+  <!--查询首页运营概况-->
+  <select id="getCountData" parameterType="java.util.HashMap" resultMap="CountDataMap">
+    SELECT date,SUM(new_user_num) AS new_user_num,SUM(active_user_num) AS active_user_num,
+    SUM(report_num) AS report_num,SUM(activity_part_num) AS activity_part_num
+    FROM(
+    (SELECT DATE(register_time) AS date, COUNT(1) AS new_user_num, 0 AS active_user_num, 0 AS report_num, 0 AS activity_part_num
+    FROM ums_user
+    WHERE
+    <if test="startTime != null and !startTime.isEmpty()">
+      register_time BETWEEN #{startTime[0]} AND #{startTime[1]}
+    </if>
+    GROUP BY date)
+
+    UNION ALL
+
+    (SELECT DATE(last_visit_time) AS date, 0 AS new_user_num, COUNT(1) AS active_user_num, 0 AS report_num, 0 AS activity_part_num
+    FROM ums_user
+    WHERE
+    <if test="startTime != null and !startTime.isEmpty()">
+      last_visit_time BETWEEN #{startTime[0]} AND #{startTime[1]}
+    </if>
+    GROUP BY date)
+
+    UNION ALL
+
+    (SELECT DATE(create_time) AS date, 0 AS new_user_num, 0 AS active_user_num, COUNT(1) AS report_num, 0 AS activity_part_num
+    FROM rms_foretaste_report
+    WHERE
+    <if test="startTime != null and !startTime.isEmpty()">
+      create_time BETWEEN #{startTime[0]} AND #{startTime[1]}
+    </if>
+    GROUP BY date)
+
+    UNION ALL
+
+    (SELECT DATE(part_time) AS date,0 AS new_user_num, 0 AS active_user_num, 0 AS report_num, COUNT(1) AS activity_part_num
+    FROM activity_user_relation
+    WHERE
+    <if test="startTime != null and !startTime.isEmpty()">
+      part_time BETWEEN #{startTime[0]} AND #{startTime[1]}
+    </if>
+    GROUP BY date)
+    ) u GROUP BY date ORDER BY date
+
+  </select>
+
+  <!--根据用户id查询该用户的标签信息-->
   <select id="selectTagById" parameterType="java.lang.String" resultMap="BaseResultMap">
     select tag_id as tagId,tag_name as tagName
     from ums_tag
@@ -27,6 +84,7 @@
     where ums_user_tag_relation.user_id = #{user_id,jdbcType=VARCHAR})
   </select>
 
+  <!--查询所有用户信息-->
   <select id="selectUserAll" resultMap="BaseResultMap">
     select user_id, nickname, phone, integration, subscription_state, open_id, register_time, state, last_visit_time
     from ums_user
@@ -62,6 +120,7 @@
     </where>
   </select>
 
+  <!--批量更新用户账户状态-->
   <update id="updateUserStateByUserId" parameterType="java.util.HashMap">
     update ums_user
     set state = #{state}
@@ -71,12 +130,14 @@
     </foreach>
   </update>
 
+  <!--更新用户的积分数量-->
   <update id="updateIntegrationByUserId" parameterType="shichi.demo.model.umsModel.UmsIntegrationChangeHistory">
     update ums_user
     set integration = #{integration,jdbcType=INTEGER}
     where user_id = #{userId,jdbcType=VARCHAR}
   </update>
 
+  <!--删除用户标签-->
   <delete id="deleteRelationByUserId" parameterType="java.lang.String">
     delete from ums_user_tag_relation
     where user_id = #{userId}

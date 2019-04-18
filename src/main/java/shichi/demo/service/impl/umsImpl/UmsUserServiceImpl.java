@@ -132,6 +132,7 @@ public class UmsUserServiceImpl implements UmsUserService {
         return umsUserMapper.selectUserByCondition(map);
     }
 
+
     /**
      * 查询所有用户信息列表
      *
@@ -184,5 +185,24 @@ public class UmsUserServiceImpl implements UmsUserService {
             logger.info("成功插入一条用户积分变更记录!");
         }
         return 1;
+    }
+
+    /**
+     * 首页统计运营概况
+     * @param map map
+     * @return List
+     */
+    @Override
+    public List getCountData(HashMap<String, Object> map) {
+        /*List startTime = new ArrayList();
+        startTime = (List) map.get("startTime");
+        String s1 = (String) startTime.get(0);
+        String s2 = (String) startTime.get(1);
+        String s3 = StringUtil.stampToDate(s1);
+        String s4 = StringUtil.stampToDate(s2);
+        startTime.add(s3);
+        startTime.add(s4);
+        map.put("startTime", startTime);*/
+        return umsUserMapper.getCountData(map);
     }
 }

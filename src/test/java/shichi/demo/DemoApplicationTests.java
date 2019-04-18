@@ -14,7 +14,9 @@ import shichi.demo.model.pmsModel.PmsProduce;
 import shichi.demo.util.JsonUtil;
 import shichi.demo.util.ReadFileUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -97,5 +99,17 @@ public class DemoApplicationTests {
 		String path = "E:\\java project\\sc\\src\\main\\resources\\json\\ChangedReason.json";
 		System.out.println(ReadFileUtil.readFileToString(path));
 		System.out.println(JsonUtil.StringToJSONArray(ReadFileUtil.readFileToString(path)));
+	}
+
+	@Test
+	public void getCountData(){
+		HashMap<String, Object> map = new HashMap<>();
+		List startTime = new ArrayList();
+		startTime.add(1554048000);
+		startTime.add(1556553600);
+		map.put("startTime", startTime);
+		System.out.println(map.toString());
+		List mapList = umsUserMapper.getCountData(map);
+		System.out.println(mapList);
 	}
 }

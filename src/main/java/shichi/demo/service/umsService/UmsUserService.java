@@ -17,4 +17,6 @@ public interface UmsUserService {
     int updateUserIntegration(HashMap<String, Object> map);
 
     List getUmsUserListPageByCondition(HashMap<String, Object> map);
+
+    List getCountData(HashMap<String, Object> map);
 }

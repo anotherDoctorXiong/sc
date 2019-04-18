@@ -144,7 +144,7 @@ public class UmsUserController {
     public Response updateUserIntegration(@RequestBody HashMap<String, Object> map) {
         Response res = new Response();
         if (!map.isEmpty()) {
-            System.out.println(map.toString());
+            //System.out.println(map.toString());
             int count = umsUserService.updateUserIntegration(map);
             if (count == 1) {
                 res.setMessage("设置成功!");
@@ -156,6 +156,20 @@ public class UmsUserController {
             res.setCode(1);
             res.setMessage("参数错误!");
         }
+        return res;
+    }
+
+    /**
+     * 首页统计运营概况
+     * @param map map
+     * @return Response
+     */
+    @PostMapping("/data/count")
+    public Response getCountData(@RequestBody HashMap<String, Object> map) {
+        Response res = new Response();
+        List dataCountList = umsUserService.getCountData(map);
+        System.out.println(dataCountList);
+        res.setData(dataCountList);
         return res;
     }
 }

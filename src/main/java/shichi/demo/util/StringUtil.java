@@ -1,5 +1,7 @@
 package shichi.demo.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -39,5 +41,19 @@ public class StringUtil {
         }else {
             return false;
         }
+    }
+
+    /**
+     * 将时间戳转换为日期类型(10位的秒级别的时间戳)
+     * @param s
+     * @return
+     */
+    public static String stampToDate(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long lt = new  Long(s);
+        Date date = new Date(lt * 1000);
+        res = simpleDateFormat.format(date);
+        return res;
     }
 }
