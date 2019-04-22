@@ -40,9 +40,7 @@
       register_time BETWEEN #{startTime[0]} AND #{startTime[1]}
     </if>
     GROUP BY date)
-
     UNION ALL
-
     (SELECT DATE(last_visit_time) AS date, 0 AS new_user_num, COUNT(1) AS active_user_num, 0 AS report_num, 0 AS activity_part_num
     FROM ums_user
     WHERE
@@ -50,9 +48,7 @@
       last_visit_time BETWEEN #{startTime[0]} AND #{startTime[1]}
     </if>
     GROUP BY date)
-
     UNION ALL
-
     (SELECT DATE(create_time) AS date, 0 AS new_user_num, 0 AS active_user_num, COUNT(1) AS report_num, 0 AS activity_part_num
     FROM rms_foretaste_report
     WHERE
@@ -60,9 +56,7 @@
       create_time BETWEEN #{startTime[0]} AND #{startTime[1]}
     </if>
     GROUP BY date)
-
     UNION ALL
-
     (SELECT DATE(part_time) AS date,0 AS new_user_num, 0 AS active_user_num, 0 AS report_num, COUNT(1) AS activity_part_num
     FROM activity_user_relation
     WHERE
@@ -70,8 +64,8 @@
       part_time BETWEEN #{startTime[0]} AND #{startTime[1]}
     </if>
     GROUP BY date)
-    ) u GROUP BY date ORDER BY date
-
+    ) u
+    GROUP BY date ORDER BY date
   </select>
 
   <!--根据用户id查询该用户的标签信息-->
