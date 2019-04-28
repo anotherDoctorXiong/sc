@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import shichi.demo.mapper.pmsMapper.PmsBrandMapper;
 import shichi.demo.mapper.pmsMapper.PmsProduceMapper;
 import shichi.demo.mapper.umsMapper.UmsIntegrationChangeHistoryMapper;
 import shichi.demo.mapper.umsMapper.UmsTagMapper;
@@ -24,6 +25,9 @@ public class DemoApplicationTests {
 
 	@Autowired
 	private PmsProduceMapper pmsProduceMapper;
+
+	@Autowired
+	private PmsBrandMapper pmsBrandMapper;
 
 	@Autowired
 	private UmsTagMapper umsTagMapper;
@@ -105,11 +109,20 @@ public class DemoApplicationTests {
 	public void getCountData(){
 		HashMap<String, Object> map = new HashMap<>();
 		List startTime = new ArrayList();
-		startTime.add(1554048000);
-		startTime.add(1556553600);
+		startTime.add("2019-04-01");
+		startTime.add("2019-04-30");
 		map.put("startTime", startTime);
 		System.out.println(map.toString());
 		List mapList = umsUserMapper.getCountData(map);
 		System.out.println(mapList);
 	}
+
+	@Test
+	public void getProduceByBrandName(){
+		String brandName = "测试2";
+		int count = pmsBrandMapper.getProduceByBrandName(brandName);
+		System.out.println(count);
+	}
+
+
 }

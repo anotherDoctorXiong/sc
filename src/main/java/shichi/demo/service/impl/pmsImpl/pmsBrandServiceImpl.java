@@ -44,16 +44,27 @@ public class pmsBrandServiceImpl implements PmsBrandService {
         String brandId = pmsBrand.getBrandId();
         String brandName = pmsBrand.getBrandName();
         PmsBrand pmsBrand1 = pmsBrandMapper.getBrandByBrandName(brandName);
+        int count = pmsBrandMapper.getProduceByBrandName(brandName);
         int count1, count2 = 0;
         if(pmsBrand1 == null) {
             count1 = pmsBrandMapper.updatePmsBrandSelective(pmsBrand);
-            count2 = pmsBrandMapper.updatePmsProduceByBrandId(brandId, brandName);
+            if (count >= 1 ) {
+                count2 = pmsBrandMapper.updatePmsProduceByBrandId(brandId, brandName);
+            }
+            else {
+                count2 = 1;
+            }
         }
         if (!pmsBrand1.getBrandId().equals(brandId)) {
             count1 =-1;
         }else {
             count1 = pmsBrandMapper.updatePmsBrandSelective(pmsBrand);
-            count2 = pmsBrandMapper.updatePmsProduceByBrandId(brandId, brandName);
+            if (count >= 1) {
+                count2 = pmsBrandMapper.updatePmsProduceByBrandId(brandId, brandName);
+            }
+            else {
+                count2 = 1;
+            }
         }
         if ( count1 == 1 && count2 >= 1) {
             return 1;

@@ -49,4 +49,6 @@ public interface PmsBrandMapper {
      * @return
      */
     PmsBrand getBrandByBrandName(String brandName);
+
+    int getProduceByBrandName(String brandName);
 }

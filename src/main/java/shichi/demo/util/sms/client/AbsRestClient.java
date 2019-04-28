@@ -1,7 +1,7 @@
 package shichi.demo.util.sms.client;
 
 public abstract class AbsRestClient {
-    private static final String SERVER = "dysmsapi.aliyuncs.com";
+
 
     /**
      * 短信发送接口, 支持在一次请求中向多个不同的手机号码发送同样内容的短信
@@ -46,14 +46,10 @@ public abstract class AbsRestClient {
      * @param bizId 发送回执ID，即发送流水号
      * @return
      */
-    public abstract String querySendDetails(Long currentPage, Long pageSize, String phoneNumber,
+    public abstract String querySendDetails(String currentPage, String pageSize, String phoneNumber,
                                             String sendDate, String accessKeyId, String action,
                                             String bizId);
 
 
-    public StringBuffer getStringBuffer(){
-        StringBuffer sb = new StringBuffer("http://");
-        sb.append(SERVER);
-        return sb;
-    }
+
 }

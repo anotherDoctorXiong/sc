@@ -197,6 +197,12 @@
     where brand_name = #{brandName}
   </select>
 
+  <!--根据品牌名称查询该品牌是否已绑定产品-->
+  <select id="getProduceByBrandName" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(1) from pms_produce
+    where brand_name = #{brandName}
+  </select>
+
   <!--根据品牌名称获取品牌列表-->
   <select id="selectByBrandName" resultType="shichi.demo.model.pmsModel.PmsBrand" parameterType="shichi.demo.model.pmsModel.PmsBrand">
     select * from pms_brand where brand_name = #{brandName,jdbcType=VARCHAR}
